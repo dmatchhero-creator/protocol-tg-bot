@@ -25,10 +25,10 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 # ВАЖНО: Замени на свой токен от BotFather
-BOT_TOKEN = "YOUR_BOT_TOKEN_HERE"
+BOT_TOKEN = "8223809188:AAG3Q8BndfMZ_s9MmTjEodkC9ePo3J16BYI"
 
 # ВАЖНО: Замени на свой личный Telegram username
-YOUR_PERSONAL_CONTACT = "@your_telegram_handle"
+YOUR_PERSONAL_CONTACT = "@VladimirHypno"
 
 # Состояния для разговора
 PROBLEM_DETAIL, POINT_B, READINESS = range(3)
