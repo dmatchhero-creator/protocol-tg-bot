@@ -1,1 +1,5 @@
-requirements.txt
+# Telegram Bot API
+python-telegram-bot==20.7
+
+# Для работы с async
+aiohttp>=3.9.0

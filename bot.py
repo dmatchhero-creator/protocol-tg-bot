@@ -17,6 +17,10 @@ from telegram.ext import (
     ConversationHandler,
 )
 
+# Импорт модулей детекции кризисов
+from crisis_detector import detect_crisis_in_message, CrisisType
+from crisis_responses import get_crisis_response
+
 # Настройка логирования
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -70,10 +74,46 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
 
 async def problem_detail(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     """Обработка подробного описания проблемы"""
-    
+
     user_id = update.effective_user.id
     problem_text = update.message.text
-    
+
+    # ПРОВЕРКА НА КРИЗИСНУЮ СИТУАЦИЮ
+    crisis_type, confidence = detect_crisis_in_message(problem_text)
+
+    if crisis_type != CrisisType.NONE and confidence >= 0.5:
+        # Обнаружен кризис - отправляем экстренный ответ
+        crisis_response = get_crisis_response(crisis_type, confidence)
+        await update.message.reply_text(
+            crisis_response,
+            parse_mode='HTML'
+        )
+
+        # Логируем кризисную ситуацию
+        logger.warning(
+            f"CRISIS DETECTED - User {user_id}: {crisis_type.value} "
+            f"(confidence: {confidence:.2f})"
+        )
+
+        # Уведомляем специалиста
+        YOUR_TELEGRAM_ID = 123456789  # Замени на свой
+        try:
+            await context.bot.send_message(
+                chat_id=YOUR_TELEGRAM_ID,
+                text=f"🚨 <b>КРИЗИС ОБНАРУЖЕН</b>\n\n"
+                     f"User: {update.effective_user.first_name} (@{update.effective_user.username})\n"
+                     f"ID: {user_id}\n"
+                     f"Тип: {crisis_type.value}\n"
+                     f"Уверенность: {confidence:.0%}\n\n"
+                     f"Сообщение:\n{problem_text}",
+                parse_mode='HTML'
+            )
+        except Exception as e:
+            logger.error(f"Ошибка отправки кризисного уведомления: {e}")
+
+        # Завершаем диалог - человеку нужна срочная помощь
+        return ConversationHandler.END
+
     # Сохраняем ответ
     user_data_storage[user_id]['problem_detail'] = problem_text
     
@@ -99,10 +139,44 @@ async def problem_detail(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
 
 async def point_b(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     """Обработка описания точки Б"""
-    
+
     user_id = update.effective_user.id
     point_b_text = update.message.text
-    
+
+    # ПРОВЕРКА НА КРИЗИСНУЮ СИТУАЦИЮ
+    crisis_type, confidence = detect_crisis_in_message(point_b_text)
+
+    if crisis_type != CrisisType.NONE and confidence >= 0.5:
+        # Обнаружен кризис - отправляем экстренный ответ
+        crisis_response = get_crisis_response(crisis_type, confidence)
+        await update.message.reply_text(
+            crisis_response,
+            parse_mode='HTML'
+        )
+
+        logger.warning(
+            f"CRISIS DETECTED - User {user_id}: {crisis_type.value} "
+            f"(confidence: {confidence:.2f})"
+        )
+
+        # Уведомляем специалиста
+        YOUR_TELEGRAM_ID = 123456789  # Замени на свой
+        try:
+            await context.bot.send_message(
+                chat_id=YOUR_TELEGRAM_ID,
+                text=f"🚨 <b>КРИЗИС ОБНАРУЖЕН</b>\n\n"
+                     f"User: {update.effective_user.first_name} (@{update.effective_user.username})\n"
+                     f"ID: {user_id}\n"
+                     f"Тип: {crisis_type.value}\n"
+                     f"Уверенность: {confidence:.0%}\n\n"
+                     f"Сообщение:\n{point_b_text}",
+                parse_mode='HTML'
+            )
+        except Exception as e:
+            logger.error(f"Ошибка отправки кризисного уведомления: {e}")
+
+        return ConversationHandler.END
+
     # Сохраняем ответ
     user_data_storage[user_id]['point_b'] = point_b_text
     
@@ -131,11 +205,45 @@ async def point_b(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
 
 async def readiness(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     """Обработка готовности и выдача контакта"""
-    
+
     user_id = update.effective_user.id
     user = update.effective_user
     readiness_text = update.message.text.lower()
-    
+
+    # ПРОВЕРКА НА КРИЗИСНУЮ СИТУАЦИЮ
+    crisis_type, confidence = detect_crisis_in_message(update.message.text)
+
+    if crisis_type != CrisisType.NONE and confidence >= 0.5:
+        # Обнаружен кризис - отправляем экстренный ответ
+        crisis_response = get_crisis_response(crisis_type, confidence)
+        await update.message.reply_text(
+            crisis_response,
+            parse_mode='HTML'
+        )
+
+        logger.warning(
+            f"CRISIS DETECTED - User {user_id}: {crisis_type.value} "
+            f"(confidence: {confidence:.2f})"
+        )
+
+        # Уведомляем специалиста
+        YOUR_TELEGRAM_ID = 123456789  # Замени на свой
+        try:
+            await context.bot.send_message(
+                chat_id=YOUR_TELEGRAM_ID,
+                text=f"🚨 <b>КРИЗИС ОБНАРУЖЕН</b>\n\n"
+                     f"User: {user.first_name} (@{user.username})\n"
+                     f"ID: {user_id}\n"
+                     f"Тип: {crisis_type.value}\n"
+                     f"Уверенность: {confidence:.0%}\n\n"
+                     f"Сообщение:\n{update.message.text}",
+                parse_mode='HTML'
+            )
+        except Exception as e:
+            logger.error(f"Ошибка отправки кризисного уведомления: {e}")
+
+        return ConversationHandler.END
+
     # Сохраняем ответ
     user_data_storage[user_id]['readiness'] = update.message.text
     
