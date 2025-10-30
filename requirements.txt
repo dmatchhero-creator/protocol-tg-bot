@@ -1,1 +1,5 @@
-requirements.txt
+# Зависимости для Telegram бота Протокол-Т
+python-telegram-bot==20.7
+
+# Зависимости для Инопланетной Сущности (Claude AI)
+anthropic>=0.18.0
